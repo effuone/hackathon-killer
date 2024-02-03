@@ -13,7 +13,7 @@ services:
     ports:
       - '5432:5432'
   web:
-    container_name: web
+    container_name: hackathonkiller-web
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
@@ -28,7 +28,7 @@ services:
         max-file: '5'
 
   api:
-    container_name: api
+    container_name: hackathonkiller-api
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
