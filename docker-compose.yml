@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=hackathon-killer
+      - POSTGRES_PASSWORD=hackathon-password
+      - POSTGRES_DB=hackathon-db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    restart: always
+    env_file: ./apps/web/.env
+    ports:
+      - 3000:80
+    logging:
+      driver: json-file
+      options:
+        max-size: '2M'
+        max-file: '5'
+
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    env_file: ./apps/api/.env
+    ports:
+      - 5000:7070
+    depends_on:
+      - postgres
+    logging:
+      driver: json-file
+      options:
+        max-size: '2M'
+        max-file: '5'
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - ~/data/redis-data:/data
+    ports:
+      - 6379:6379
+    restart: always
+
+volumes:
+  postgres:
