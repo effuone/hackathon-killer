@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        Int        @id @default(autoincrement())
+  email                     String     @unique
+  firstName                 String
+  lastName                  String
+  passwordHash              String
+  currentHashedRefreshToken String?
+  role                      UserRole
+  organizer                 Organizer?
+  volunteer                 Volunteer?
+
+  @@map("users")
+}
+
+enum UserRole {
+  ORGANIZER
+  VOLUNTEER
+}
+
+model Organizer {
+  id           Int     @id @default(autoincrement())
+  userId       Int     @unique
+  user         User    @relation(fields: [userId], references: [id])
+  events       Event[]
+  createdTasks Task[]
+
+  @@map("organizers")
+}
+
+model Volunteer {
+  id      Int             @id @default(autoincrement())
+  userId  Int             @unique
+  user    User            @relation(fields: [userId], references: [id])
+  tasks   TaskVolunteer[]
+  ratings Rating[]
+
+  @@map("volunteers")
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  location    String?
+  startTime   DateTime
+  endTime     DateTime
+  organizerId Int
+  organizer   Organizer @relation(fields: [organizerId], references: [id])
+  tasks       Task[]
+
+  @@map("events")
+}
+
+model Task {
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime        @default(now())
+  eventId     Int
+  event       Event           @relation(fields: [eventId], references: [id])
+  organizerId Int
+  organizer   Organizer       @relation(fields: [organizerId], references: [id])
+  volunteers  TaskVolunteer[]
+  ratings     Rating[]
+
+  @@map("tasks")
+}
+
+model TaskVolunteer {
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
+
+  @@id([taskId, volunteerId])
+  @@map("task_volunteers")
+}
+
+model Rating {
+  id          Int       @id @default(autoincrement())
+  score       Int
+  comment     String?
+  taskId      Int
+  task        Task      @relation(fields: [taskId], references: [id])
+  volunteerId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+
+  @@map("ratings")
+}

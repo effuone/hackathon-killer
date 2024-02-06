@@ -26,9 +26,9 @@ services:
     env_file:
       - ./apps/api/.env
     environment:
-      POSTGRES_DB: hackathon-killer-db
-      POSTGRES_USER: hackathon-user
-      POSTGRES_PASSWORD: hackathon-password
+      POSTGRES_DB: jaqsylyq-db
+      POSTGRES_USER: jaqsylyq-user
+      POSTGRES_PASSWORD: jaqsylyq-password
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
